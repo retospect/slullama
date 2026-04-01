@@ -39,17 +39,25 @@ class ClientTunnel:
         cmd = [
             "ssh",
             "-N",
-            "-L", f"{self.local_port}:localhost:{self.server_port}",
-            "-o", "StrictHostKeyChecking=no",
-            "-o", "UserKnownHostsFile=/dev/null",
-            "-o", "ExitOnForwardFailure=yes",
-            "-o", "ServerAliveInterval=30",
-            "-o", "ServerAliveCountMax=3",
+            "-L",
+            f"{self.local_port}:localhost:{self.server_port}",
+            "-o",
+            "StrictHostKeyChecking=no",
+            "-o",
+            "UserKnownHostsFile=/dev/null",
+            "-o",
+            "ExitOnForwardFailure=yes",
+            "-o",
+            "ServerAliveInterval=30",
+            "-o",
+            "ServerAliveCountMax=3",
             self.host,
         ]
         log.info(
             "Opening SSH tunnel: localhost:%d → %s:%d",
-            self.local_port, self.host, self.server_port,
+            self.local_port,
+            self.host,
+            self.server_port,
         )
         self._proc = subprocess.Popen(
             cmd,
@@ -60,6 +68,7 @@ class ClientTunnel:
         atexit.register(self.close_sync)
         # Give SSH time to establish
         import time
+
         time.sleep(1.5)
 
         if self._proc.poll() is not None:
@@ -91,17 +100,25 @@ class ClientTunnel:
         cmd = [
             "ssh",
             "-N",
-            "-L", f"{self.local_port}:localhost:{self.server_port}",
-            "-o", "StrictHostKeyChecking=no",
-            "-o", "UserKnownHostsFile=/dev/null",
-            "-o", "ExitOnForwardFailure=yes",
-            "-o", "ServerAliveInterval=30",
-            "-o", "ServerAliveCountMax=3",
+            "-L",
+            f"{self.local_port}:localhost:{self.server_port}",
+            "-o",
+            "StrictHostKeyChecking=no",
+            "-o",
+            "UserKnownHostsFile=/dev/null",
+            "-o",
+            "ExitOnForwardFailure=yes",
+            "-o",
+            "ServerAliveInterval=30",
+            "-o",
+            "ServerAliveCountMax=3",
             self.host,
         ]
         log.info(
             "Opening SSH tunnel: localhost:%d → %s:%d",
-            self.local_port, self.host, self.server_port,
+            self.local_port,
+            self.host,
+            self.server_port,
         )
         self._async_proc = await asyncio.create_subprocess_exec(
             *cmd,
@@ -127,7 +144,7 @@ class ClientTunnel:
             self._async_proc.terminate()
             try:
                 await asyncio.wait_for(self._async_proc.wait(), timeout=5)
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 self._async_proc.kill()
                 await self._async_proc.wait()
         self._async_proc = None

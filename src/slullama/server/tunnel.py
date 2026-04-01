@@ -33,17 +33,25 @@ class SshTunnel:
         cmd = [
             "ssh",
             "-N",  # no remote command
-            "-L", f"{self.local_port}:localhost:{self.remote_port}",
-            "-o", "StrictHostKeyChecking=no",
-            "-o", "UserKnownHostsFile=/dev/null",
-            "-o", "ExitOnForwardFailure=yes",
-            "-o", "ServerAliveInterval=30",
-            "-o", "ServerAliveCountMax=3",
+            "-L",
+            f"{self.local_port}:localhost:{self.remote_port}",
+            "-o",
+            "StrictHostKeyChecking=no",
+            "-o",
+            "UserKnownHostsFile=/dev/null",
+            "-o",
+            "ExitOnForwardFailure=yes",
+            "-o",
+            "ServerAliveInterval=30",
+            "-o",
+            "ServerAliveCountMax=3",
             self.node,
         ]
         log.info(
             "Opening SSH tunnel: localhost:%d → %s:%d",
-            self.local_port, self.node, self.remote_port,
+            self.local_port,
+            self.node,
+            self.remote_port,
         )
         self._proc = await asyncio.create_subprocess_exec(
             *cmd,
@@ -54,7 +62,9 @@ class SshTunnel:
         await asyncio.sleep(1.5)
 
         if self._proc.returncode is not None:
-            stderr = (await self._proc.stderr.read()).decode() if self._proc.stderr else ""
+            stderr = (
+                (await self._proc.stderr.read()).decode() if self._proc.stderr else ""
+            )
             raise RuntimeError(
                 f"SSH tunnel to {self.node} failed (rc={self._proc.returncode}): {stderr}"
             )
@@ -67,7 +77,7 @@ class SshTunnel:
             self._proc.terminate()
             try:
                 await asyncio.wait_for(self._proc.wait(), timeout=5)
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 self._proc.kill()
                 await self._proc.wait()
         self._proc = None

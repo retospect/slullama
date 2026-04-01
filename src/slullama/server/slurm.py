@@ -69,7 +69,8 @@ class SlurmManager:
 
         log.info("Submitting sbatch script: %s", path)
         proc = await asyncio.create_subprocess_exec(
-            "sbatch", path,
+            "sbatch",
+            path,
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE,
         )
@@ -83,7 +84,9 @@ class SlurmManager:
         # Parse "Submitted batch job 12345"
         m = re.search(r"(\d+)", stdout.decode())
         if not m:
-            raise RuntimeError(f"Could not parse job ID from: {stdout.decode().strip()}")
+            raise RuntimeError(
+                f"Could not parse job ID from: {stdout.decode().strip()}"
+            )
 
         self.job_id = m.group(1)
         log.info("Submitted Slurm job %s", self.job_id)
@@ -95,7 +98,10 @@ class SlurmManager:
             return JobInfo(job_id="", state=JobState.NONE)
 
         proc = await asyncio.create_subprocess_exec(
-            "scontrol", "show", "job", self.job_id,
+            "scontrol",
+            "show",
+            "job",
+            self.job_id,
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE,
         )
@@ -108,9 +114,9 @@ class SlurmManager:
 
         if m := re.search(r"JobState=(\S+)", text):
             state = JobState.from_str(m.group(1))
-        if m := re.search(r"BatchHost=(\S+)", text):
-            node = m.group(1)
-        elif m := re.search(r"NodeList=(\S+)", text):
+        if (m := re.search(r"BatchHost=(\S+)", text)) or (
+            m := re.search(r"NodeList=(\S+)", text)
+        ):
             node = m.group(1)
         if m := re.search(r"TimeLeft=(\S+)", text):
             time_left = m.group(1)
@@ -130,7 +136,9 @@ class SlurmManager:
 
         mins = minutes or self.config.slurm.idle_timeout
         proc = await asyncio.create_subprocess_exec(
-            "scontrol", "update", f"JobId={self.job_id}",
+            "scontrol",
+            "update",
+            f"JobId={self.job_id}",
             f"TimeLimit=+{mins}",
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE,
@@ -156,7 +164,8 @@ class SlurmManager:
 
         log.info("Cancelling job %s", self.job_id)
         proc = await asyncio.create_subprocess_exec(
-            "scancel", self.job_id,
+            "scancel",
+            self.job_id,
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE,
         )
@@ -184,14 +193,15 @@ class SlurmManager:
                 )
             log.debug(
                 "Job %s state=%s, waiting... (%ds/%ds)",
-                info.job_id, info.state.value, elapsed, timeout,
+                info.job_id,
+                info.state.value,
+                elapsed,
+                timeout,
             )
             await asyncio.sleep(interval)
             elapsed += interval
 
-        raise TimeoutError(
-            f"Job {self.job_id} did not start within {timeout}s"
-        )
+        raise TimeoutError(f"Job {self.job_id} did not start within {timeout}s")
 
     @property
     def is_active(self) -> bool:

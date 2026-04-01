@@ -12,14 +12,13 @@ Handles:
 from __future__ import annotations
 
 import asyncio
-import json
 import logging
 import time
 
 from aiohttp import ClientSession, ClientTimeout, web
 
 from slullama.config import ServerConfig
-from slullama.server.slurm import JobState, SlurmManager
+from slullama.server.slurm import SlurmManager
 from slullama.server.tunnel import SshTunnel
 
 log = logging.getLogger("slullama.proxy")
@@ -129,9 +128,7 @@ class OllamaProxy:
     async def handle_proxy(self, request: web.Request) -> web.StreamResponse:
         """Proxy any Ollama API request, streaming the response."""
         if not self._check_auth(request):
-            return web.json_response(
-                {"error": "unauthorized"}, status=401
-            )
+            return web.json_response({"error": "unauthorized"}, status=401)
 
         try:
             backend_url = await self._ensure_backend()
@@ -169,9 +166,7 @@ class OllamaProxy:
             )
         except Exception as exc:
             log.error("Proxy request failed: %s", exc)
-            return web.json_response(
-                {"error": f"proxy error: {exc}"}, status=502
-            )
+            return web.json_response({"error": f"proxy error: {exc}"}, status=502)
 
         # Stream the response back
         proxy_resp = web.StreamResponse(
@@ -241,7 +236,8 @@ class OllamaProxy:
             if idle >= timeout:
                 log.info(
                     "Idle for %.0fs (timeout=%ds), tearing down backend",
-                    idle, timeout,
+                    idle,
+                    timeout,
                 )
                 await self._teardown()
 

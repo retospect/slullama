@@ -2,18 +2,13 @@
 
 from __future__ import annotations
 
-import os
 import textwrap
 from pathlib import Path
 
 import pytest
 
 from slullama.config import (
-    ClientConfig,
     Config,
-    OllamaConfig,
-    ServerConfig,
-    SlurmConfig,
 )
 
 
@@ -32,7 +27,8 @@ def test_default_config():
 def test_load_from_toml(tmp_path: Path):
     """Config loads from a TOML file."""
     toml = tmp_path / "config.toml"
-    toml.write_text(textwrap.dedent("""\
+    toml.write_text(
+        textwrap.dedent("""\
         [server]
         port = 9999
         token = "secret"
@@ -54,7 +50,8 @@ def test_load_from_toml(tmp_path: Path):
         server_port = 9999
         token = "secret"
         local_port = 8888
-    """))
+    """)
+    )
 
     cfg = Config.load(toml)
 
@@ -102,7 +99,8 @@ def test_env_overrides(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
 def test_unknown_keys_ignored(tmp_path: Path):
     """Unknown keys in TOML don't cause errors."""
     toml = tmp_path / "config.toml"
-    toml.write_text(textwrap.dedent("""\
+    toml.write_text(
+        textwrap.dedent("""\
         [server]
         port = 5555
         unknown_key = "ignored"
@@ -110,7 +108,8 @@ def test_unknown_keys_ignored(tmp_path: Path):
         [slurm]
         partition = "test"
         future_option = true
-    """))
+    """)
+    )
 
     cfg = Config.load(toml)
     assert cfg.server.port == 5555

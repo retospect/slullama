@@ -38,7 +38,10 @@ def cmd_connect(args: argparse.Namespace) -> None:
 
     host = args.host or config.client.host
     if not host:
-        print("Error: no host specified. Use: slullama connect user@headnode", file=sys.stderr)
+        print(
+            "Error: no host specified. Use: slullama connect user@headnode",
+            file=sys.stderr,
+        )
         sys.exit(1)
 
     config.client.host = host
@@ -66,6 +69,7 @@ def cmd_connect(args: argparse.Namespace) -> None:
         print("Press Ctrl+C to close.")
         # Block until interrupted
         import signal
+
         signal.pause()
     except KeyboardInterrupt:
         print("\nClosing tunnel...")
@@ -115,9 +119,7 @@ def main() -> None:
     parser.add_argument(
         "-v", "--verbose", action="store_true", help="Enable debug logging"
     )
-    parser.add_argument(
-        "--config", type=str, default=None, help="Path to config file"
-    )
+    parser.add_argument("--config", type=str, default=None, help="Path to config file")
     sub = parser.add_subparsers(dest="command")
 
     # ── serve ──────────────────────────────────────────────────

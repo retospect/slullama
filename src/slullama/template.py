@@ -73,7 +73,7 @@ def render_template(config: ServerConfig) -> str:
     copy_commands = ""
     cleanup_commands = ""
     if oc.copy_binary and oc.copy_source:
-        dest = f"/tmp/slullama_ollama_$$SLURM_JOB_ID"
+        dest = "/tmp/slullama_ollama_$$SLURM_JOB_ID"
         copy_commands = f'cp "{oc.copy_source}" "{dest}" && chmod +x "{dest}"'
         ollama_binary = dest
         if oc.cleanup_binary:

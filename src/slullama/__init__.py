@@ -1,17 +1,25 @@
 """slullama — Shared Ollama gateway over Slurm."""
 
-__version__ = "0.1.0"
+from importlib.metadata import version
+
+__version__ = version("slullama")
 
 from slullama.client.client import SlulamaClient
-from slullama.config import ClientConfig, Config, OllamaConfig, ServerConfig, SlurmConfig
+from slullama.config import (
+    ClientConfig,
+    Config,
+    OllamaConfig,
+    ServerConfig,
+    SlurmConfig,
+)
 
 __all__ = [
-    "SlulamaClient",
-    "Config",
-    "ServerConfig",
     "ClientConfig",
-    "SlurmConfig",
+    "Config",
     "OllamaConfig",
+    "ServerConfig",
+    "SlulamaClient",
+    "SlurmConfig",
 ]
 
 

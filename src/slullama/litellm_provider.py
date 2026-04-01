@@ -15,7 +15,8 @@ from __future__ import annotations
 
 import json
 import logging
-from typing import Any, Iterator
+from collections.abc import Iterator
+from typing import Any
 
 log = logging.getLogger("slullama.litellm")
 
@@ -74,7 +75,6 @@ def register() -> None:
             **kwargs: Any,
         ) -> ModelResponse:
             """Synchronous completion via slullama."""
-            import asyncio
 
             client = self._get_client()
             client._ensure_connected()
@@ -211,7 +211,10 @@ def register() -> None:
                     yield delta_resp
 
     handler = SlulamaLLM()
-    if not hasattr(litellm, "custom_provider_map") or litellm.custom_provider_map is None:
+    if (
+        not hasattr(litellm, "custom_provider_map")
+        or litellm.custom_provider_map is None
+    ):
         litellm.custom_provider_map = []
 
     # Don't double-register
